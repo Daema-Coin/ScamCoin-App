@@ -56,9 +56,9 @@ export default {
     return {
       items: [],
       selectedItems: [],
-      booth_id: 3, // 임시로 설정한 부스 ID
+      booth_id: 4, // 임시로 설정한 부스 ID
       boothName: '',
-      coin: 100000
+      coin: 0
     };
   },
   computed: {

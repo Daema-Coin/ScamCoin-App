@@ -36,10 +36,12 @@ export default {
   },
   methods: {
     async login() {
+      console.log('Login button clicked'); // 로그인 버튼 클릭 확인 로그
       this.formError = !this.account_id || !this.password;
 
       if (!this.formError) {
         try {
+          console.log('Sending POST request to login'); // POST 요청 전 로그
           const response = await axios.post('http://3.37.88.98:8000/user/login', {
             account_id: this.account_id,
             password: this.password
@@ -47,7 +49,9 @@ export default {
 
           if (response.status === 200 || response.status === 201) {
             const token = response.data.token;
+            console.log('Login successful, token received:', token); // 로그인 성공 후 토큰 출력
             mutations.setToken(token);
+            console.log('Token set in store:', store.token); // 토큰 저장 확인 로그
             axios.defaults.headers.common['Authorization'] = `Bearer ${store.token}`;
             this.$router.push('/home');
           } else {
@@ -62,7 +66,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .login-container {
   display: flex;
