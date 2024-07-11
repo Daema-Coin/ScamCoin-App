@@ -34,6 +34,27 @@ module.exports = {
         })
       }
     }
-  }
-}
+  },
+  /*
+  ** Nuxt.js modules
+  */
+  modules: [
+    '@nuxtjs/axios',
+  ],
+  /*
+  ** Axios module configuration
+  */
+  axios: {
+    baseURL: 'http://3.37.88.98:8000', // API 서버 주소
+  },
 
+  plugins: [
+    { src: '~/plugins/axios.js', mode: 'client' },
+    { src: '~/plugins/toasted.js', mode: 'client' }
+  ],
+
+  css: [
+    '@fortawesome/fontawesome-free/css/all.css'
+  ]
+
+}
