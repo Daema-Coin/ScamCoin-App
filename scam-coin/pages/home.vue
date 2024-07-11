@@ -67,28 +67,36 @@ export default {
     }
   },
   methods: {
-    fetchMenu() {
-      axios.get(`http://3.37.88.98:8000/menu/${this.booth_id}`)
-        .then(response => {
-          this.items = response.data.menu.map(item => ({
-            ...item,
-            quantity: 1 // quantity 필드 추가
-          }));
-          this.boothName = response.data.booth_name;
-          this.syncSelectedItems();
-        })
-        .catch(error => {
-          console.error('메뉴를 불러오는데 실패했습니다.', error);
+    async fetchMenu() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://3.37.88.98:8000/menu/${this.booth_id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
+        this.items = response.data.menu.map(item => ({
+          ...item,
+          quantity: 1 // quantity 필드 추가
+        }));
+        this.boothName = response.data.booth_name;
+        this.syncSelectedItems();
+      } catch (error) {
+        console.error('메뉴를 불러오는데 실패했습니다.', error);
+      }
     },
-    fetchCoin() {
-      axios.get('http://3.37.88.98:8000/user/coin')
-        .then(response => {
-          this.coin = response.data.coin;
-        })
-        .catch(error => {
-          console.error('잔여 코인을 불러오는데 실패했습니다.', error);
+    async fetchCoin() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://3.37.88.98:8000/user/coin', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
+        this.coin = response.data.coin;
+      } catch (error) {
+        console.error('잔여 코인을 불러오는데 실패했습니다.', error);
+      }
     },
     isSelected(item) {
       return this.selectedItems.some(selected => selected.id === item.id);

@@ -15,7 +15,7 @@
       <div class="button-container">
         <button type="submit" class="login-button">로그인 →</button>
         <p v-if="formError" class="error-message">아이디와 비밀번호를 입력해주세요.</p>
-        <p v-if="loginError" class="error-message">로그인 중 오류가 발생했습니다.</p>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
     </form>
   </div>
@@ -23,7 +23,6 @@
 
 <script>
 import axios from 'axios';
-import { store, mutations } from '../plugins/token';
 
 export default {
   data() {
@@ -31,52 +30,55 @@ export default {
       account_id: '',
       password: '',
       formError: false,
-      loginError: false,
+      errorMessage: ''
     };
   },
   methods: {
     async login() {
-      console.log('Login button clicked'); // 로그인 버튼 클릭 확인 로그
-      this.formError = !this.account_id || !this.password;
+      this.formError = false;
+      this.errorMessage = '';
 
-      if (!this.formError) {
-        try {
-          console.log('Sending POST request to login'); // POST 요청 전 로그
-          const response = await axios.post('http://3.37.88.98:8000/user/login', {
-            account_id: this.account_id,
-            password: this.password
-          });
-
-          if (response.status === 200 || response.status === 201) {
-            const token = response.data.token;
-            console.log('Login successful, token received:', token); // 로그인 성공 후 토큰 출력
-            mutations.setToken(token);
-            console.log('Token set in store:', store.token); // 토큰 저장 확인 로그
-            axios.defaults.headers.common['Authorization'] = `Bearer ${store.token}`;
-            this.$router.push('/home');
-          } else {
-            this.loginError = true;
-          }
-        } catch (error) {
-          this.loginError = true;
-          console.error('로그인 요청 중 오류 발생:', error);
-        }
+      if (!this.account_id || !this.password) {
+        this.formError = true;
+        return;
       }
-    },
-  },
+
+      try {
+        const response = await axios.post('http://3.37.88.98:8000/user/login', {
+          account_id: this.account_id,
+          password: this.password
+        });
+        
+        // HTTP 상태 코드가 200이나 201이면 토큰을 localStorage에 저장
+        if (response.status === 200 || response.status === 201) {
+          const token = response.data.token;
+          localStorage.setItem('token', token); // 토큰을 localStorage에 저장
+        }
+
+        // 로그인 성공 후 다음 페이지로 이동
+        this.$router.push('/home');
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.errorMessage = '아이디나 비밀번호가 올바르지 않습니다.';
+        } else {
+          this.errorMessage = '로그인 중 오류가 발생했습니다.';
+        }
+        console.error('로그인에 실패했습니다.', error);
+      }
+    }
+  }
 };
 </script>
+
 <style scoped>
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  /* Spread elements evenly */
   height: 100vh;
   background-color: #fff;
   padding: 20px;
-  /* Add padding to ensure the header is not too close to the top */
 }
 
 .login-header {

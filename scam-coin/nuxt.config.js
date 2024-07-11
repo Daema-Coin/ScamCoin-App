@@ -49,8 +49,7 @@ module.exports = {
   },
 
   plugins: [
-    { src: '~/plugins/axios.js', mode: 'client' },
-    { src: '~/plugins/toasted.js', mode: 'client' }
+    { src: '~/plugins/index.js', mode: 'client'}
   ],
 
   css: [
